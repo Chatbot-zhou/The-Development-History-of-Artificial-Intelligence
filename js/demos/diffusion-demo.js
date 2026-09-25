@@ -99,13 +99,14 @@
         if (target === 1 && t >= 1) { t = 1; finished = true; }
         render();
         if (finished) { playing = 0; if (done) done(); return; }
-        raf = requestAnimationFrame(frame);
+        raf = setTimeout(frame, 16);
       }
       frame();
     }
 
     $(".df-play").addEventListener("click", () => {
       if (t < 1) { makeNoise(); }
+      playing = 1;
       animate(0, -0.012);
     });
     $(".df-forward").addEventListener("click", () => animate(1, 0.02));

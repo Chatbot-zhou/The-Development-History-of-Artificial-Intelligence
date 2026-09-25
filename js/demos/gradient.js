@@ -205,6 +205,7 @@
     function place(xy) {
       running = false; clearTimeout(raf);
       ball = [xy[0], xy[1]];
+      ballVis = [xy[0], xy[1]];
       steps = 0; trail = [[xy[0], xy[1]]];
       $(".gd-run").textContent = "▶ 开始下山";
       $(".gd-state").textContent = "待命";

@@ -77,7 +77,8 @@
     function trainStep() {
       const lrD = 0.06, lrG = 0.035, B = 16;
       /* --- 训练 D：真实=1，生成=0 --- */
-      const gv = [0, 0, 0, 0], gc = 0;
+      const gv = [0, 0, 0, 0];
+      let gc = 0;
       for (let b = 0; b < B; b++) {
         const x = REAL[Math.floor(Math.random() * REAL.length)];
         const d = D(x), err = d - 1;
@@ -100,7 +101,8 @@
 
       /* --- 训练 G：最小化 -log D(G(z))，梯度穿过 D 传到 G --- */
       let gg = 0;
-      const gw1 = new Array(6).fill(0), gb1 = new Array(6).fill(0), gw2 = new Array(6).fill(0), gb2 = 0;
+      const gw1 = new Array(6).fill(0), gb1 = new Array(6).fill(0), gw2 = new Array(6).fill(0);
+      let gb2 = 0;
       for (let b = 0; b < B; b++) {
         const z = gauss();
         const [x0, h] = forwardG(z);

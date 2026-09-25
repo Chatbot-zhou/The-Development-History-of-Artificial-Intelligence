@@ -95,18 +95,19 @@
     kernelNote();
 
     /* ---------- 卷积（逐行扫描动画）+ 池化 ---------- */
-    let scanRow = 0, raf = 0, running = false;
+    let scanRow = 0, raf = 0, running = false, inputSnapshot = null;
     function computeAll() {
-      cancelAnimationFrame(raf);
+      clearTimeout(raf);
       scanRow = 0;
       outCtx.fillStyle = "#000"; outCtx.fillRect(0, 0, S, S);
+      inputSnapshot = inCtx.getImageData(0, 0, S, S);   // 快照：扫描带不再堆积污染输入画布
       running = true;
       scanRows();
     }
     function scanRows() {
       if (!running) return;
       const k = KERNELS[sel.value].k;
-      const src = inCtx.getImageData(0, 0, S, S).data;
+      const src = inputSnapshot.data;
       outCtx.fillStyle = "#000"; outCtx.fillRect(0, scanRow, S, 4);
       for (let r = scanRow; r < Math.min(scanRow + 5, S - 1); r++) {
         for (let c = 1; c < S - 1; c++) {
@@ -122,13 +123,14 @@
         }
       }
       scanRow += 5;
-      // 扫描进度高亮
+      // 扫描进度高亮：先恢复快照再画当前扫描带
+      inCtx.putImageData(inputSnapshot, 0, 0);
       inCtx.save();
-      inCtx.strokeStyle = "rgba(37,99,235,.9)"; inCtx.lineWidth = 2;
-      inCtx.strokeRect(0.5, Math.max(0, scanRow - 6), S - 1, 6);
+      inCtx.strokeStyle = "rgba(37,99,235,.9)"; inCtx.lineWidth = 3;
+      inCtx.strokeRect(1, Math.max(1, scanRow - 6), S - 2, 6);
       inCtx.restore();
-      if (scanRow < S - 1) { raf = requestAnimationFrame(scanRows); }
-      else { running = false; pool(); }
+      if (scanRow < S - 1) { raf = setTimeout(scanRows, 16); }
+      else { running = false; inCtx.putImageData(inputSnapshot, 0, 0); pool(); }
     }
     function pool() {
       const d = outCtx.getImageData(0, 0, S, S).data;
