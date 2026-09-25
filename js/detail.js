@@ -78,11 +78,28 @@
       '<h3 class="dg-evt-title">' + esc(evt.title) + '</h3>' +
       '<span class="deck-count"></span>' +
       '</div>';
-    if (evt.tagline) html += '<p class="dg-tagline">' + esc(evt.tagline) + '</p>';
+    // 有图：与单事件卡片一致——图片左侧竖排，文字在右
     if (evt.img) {
-      html += '<img class="dg-evt-img" src="' + esc(evt.img) + '" alt="' + esc(evt.title) + '" ' +
-        'onerror="this.style.display=\'none\'">';
+      html += '<div class="dg-hero">' +
+        '<figure class="dg-figure">' +
+          '<img src="' + esc(evt.img) + '" alt="' + esc(evt.title) + '" ' +
+          '">' +
+          (evt.imgCaption ? '<figcaption>' + esc(evt.imgCaption) + '</figcaption>' : '') +
+        '</figure>' +
+        '<div class="dg-text">' +
+          (evt.tagline ? '<p class="dg-tagline">' + esc(evt.tagline) + '</p>' : '') +
+          '<div class="dg-desc">' + evt.desc.map(p => '<p>' + esc(p) + '</p>').join("") + '</div>';
+      if (evt.theory) {
+        html += '<div class="dg-theory-box"><b>' + esc(evt.theory.title) + '</b>' + esc(evt.theory.text) + '</div>';
+      }
+      if (evt.demo) {
+        html += '<div class="dg-actions"><button class="btn btn-primary" data-demo-idx="' + idx + '">互动演示</button></div>';
+      }
+      html += '</div></div>';
+      return html;
     }
+
+    // 无图：通栏排版
     html += '<div class="dg-desc">' + evt.desc.map(p => '<p>' + esc(p) + '</p>').join("") + '</div>';
     if (evt.theory) {
       html += '<div class="dg-theory-box"><b>' + esc(evt.theory.title) + '</b>' + esc(evt.theory.text) + '</div>';
@@ -125,6 +142,13 @@
   }
 
   function bindDetail(g) {
+    // 图片加载失败时隐藏整个图块，正文自动占满
+    body.querySelectorAll(".dg-figure img").forEach(img => {
+      img.addEventListener("error", () => {
+        const fig = img.closest(".dg-figure");
+        if (fig) fig.style.display = "none";
+      });
+    });
     body.querySelectorAll("[data-act='demo']").forEach(btn => {
       btn.addEventListener("click", () => openDemoView(g.events[0]));
     });
