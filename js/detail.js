@@ -347,6 +347,25 @@
     step(dir);
   }
 
+  /* ---------- 触摸横滑：切换卡片 / 年份（与滚轮同一 step 逻辑） ---------- */
+  let touchStart = null;
+  panel.addEventListener("touchstart", (e) => {
+    if (e.touches.length !== 1) { touchStart = null; return; }
+    const t0 = e.touches[0];
+    touchStart = { x: t0.clientX, y: t0.clientY, time: Date.now() };
+  }, { passive: true });
+  panel.addEventListener("touchend", (e) => {
+    if (!touchStart || !vmode) return;
+    const t0 = e.changedTouches[0];
+    const dx = t0.clientX - touchStart.x;
+    const dy = t0.clientY - touchStart.y;
+    const dt = Date.now() - touchStart.time;
+    touchStart = null;
+    if (dt > 700) return;                       // 长按不算滑动
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return;  // 需要明显的横向滑动
+    tryStep(dx < 0 ? 1 : -1, 350);
+  }, { passive: true });
+
   document.addEventListener("wheel", (e) => {
     if (!vmode) return;
     if (hasScrollableRoom(e.target, e.deltaY > 0 ? 1 : -1)) return;

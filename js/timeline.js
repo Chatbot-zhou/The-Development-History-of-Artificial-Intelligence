@@ -12,7 +12,7 @@
 
   const MIN_YEAR = 1946, MAX_YEAR = 2026;
   const PAD_X = 150;                 // 轴线两端留白
-  const PPY = 110;                   // 每年像素数（固定：最小形态）
+  let PPY = window.innerWidth < 700 ? 80 : 110;  // 每年像素数（手机更紧凑）
   const MIN_SAME = 108;              // 同侧相邻节点的最小间距（名称不重叠）
   let offset = 0;                    // 画布平移量
 
@@ -31,6 +31,15 @@
     const axis = document.createElement("div");
     axis.className = "tl-axis";
     canvas.appendChild(axis);
+
+    // 年代刻度：每 10 年一个淡灰标签（悬在轴线上方远处，帮助在空白区定位）
+    for (let y = 1950; y <= 2020; y += 10) {
+      const tick = document.createElement("span");
+      tick.className = "tl-decade";
+      tick.style.left = xOf(y) + "px";
+      tick.textContent = y;
+      canvas.appendChild(tick);
+    }
 
     let lastAbove = -Infinity, lastBelow = -Infinity;
     groups.forEach((g, i) => {
@@ -135,6 +144,33 @@
     viewport.classList.remove("dragging");
     setTimeout(() => { suppressClick = false; }, 0);
   });
+
+  /* ---------- 触摸拖动（手机横滑浏览） ---------- */
+  let touchX = null;
+  viewport.addEventListener("touchstart", (e) => {
+    if (e.touches.length !== 1) { touchX = null; return; }
+    touchX = e.touches[0].clientX;
+    dragging = true; moved = 0; suppressClick = false;
+    viewport.classList.add("dragging");
+  }, { passive: true });
+  viewport.addEventListener("touchmove", (e) => {
+    if (touchX === null || e.touches.length !== 1) return;
+    const x = e.touches[0].clientX;
+    const dx = x - touchX;
+    touchX = x;
+    moved += Math.abs(dx);
+    offset += dx;
+    clampOffset();
+    applyTransform();
+    if (moved > 8) suppressClick = true;
+  }, { passive: true });
+  const endTouch = () => {
+    touchX = null; dragging = false;
+    viewport.classList.remove("dragging");
+    setTimeout(() => { suppressClick = false; }, 0);
+  };
+  viewport.addEventListener("touchend", endTouch);
+  viewport.addEventListener("touchcancel", endTouch);
 
   /* ---------- 滚轮：沿时间轴左右平移 ---------- */
   viewport.addEventListener("wheel", (e) => {

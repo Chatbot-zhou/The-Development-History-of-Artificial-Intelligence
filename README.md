@@ -6,6 +6,8 @@
 - **GitHub**：<https://github.com/Chatbot-zhou/The-Development-History-of-Artificial-Intelligence>
 - **Gitee**：<https://gitee.com/chatbotzhou/the-development-history-of-artificial-intelligence>
 
+> 支持桌面与手机浏览：手机上时间轴可触摸拖动，卡片模式横滑切换卡片/年份。
+>
 > 每完成一个版本，代码会同步推送到 GitHub 与 Gitee 两个仓库，静态站点随仓库更新自动部署。
 
 ## 打开方式
