@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人工智能发展历程 · 交互时间线</title>
+<link rel="stylesheet" href="css/main.css?v=20">
+<link rel="stylesheet" href="css/timeline.css?v=20">
+<link rel="stylesheet" href="css/demos.css?v=20">
+</head>
+<body>
+  <header class="site-header">
+    <h1>人工智能发展历程</h1>
+    <p class="site-sub">沿着时间轴拖动探索 · 点击年份节点查看事件与理论 · 部分节点内置可交互的原理演示</p>
+  </header>
+
+  <main>
+    <section class="stage">
+      <!-- 选中节点后出现：左上角站点标题 + 左侧竖向时间轴 -->
+      <div class="rail-col" id="railCol" hidden>
+        <div class="stage-brand">
+          <h1>人工智能发展历程</h1>
+          <p>AI DEVELOPMENT TIMELINE</p>
+        </div>
+        <aside class="rail" id="rail">
+          <div class="rail-track" id="railTrack"><!-- 由 detail.js 渲染 --></div>
+        </aside>
+      </div>
+
+      <div class="stage-main">
+        <!-- 默认：横向时间轴 -->
+        <section class="timeline-wrap" id="timelineWrap">
+          <div class="tl-viewport" id="tlViewport">
+            <div class="tl-canvas" id="tlCanvas"><!-- 由 timeline.js 动态渲染 --></div>
+          </div>
+          <div class="tl-hint">
+            <span class="tl-hint-item">🖱 按住拖动 · 滚轮左右移动</span>
+            <span class="tl-hint-item">点击节点查看详情</span>
+          </div>
+        </section>
+
+        <!-- 选中节点后出现：右侧详情面板 -->
+        <section class="detail-panel" id="detailPanel" hidden>
+          <div class="detail-panel-head">
+            <button class="btn btn-ghost" id="panelBack">← 返回时间轴</button>
+            <span class="demo-note">滚轮滑动卡片 · 滑到底自动切年份 · Esc 返回</span>
+          </div>
+          <div class="detail-body" id="detailBody"><!-- 由 detail.js 渲染 --></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="legend">
+      <span class="legend-item"><i class="dot dot-milestone"></i>里程碑事件</span>
+      <span class="legend-item"><i class="dot dot-theory"></i>理论突破（含互动演示）</span>
+      <span class="legend-item"><i class="dot dot-era"></i>时代分界</span>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    图片素材来自维基共享资源等公开渠道 · 仅用于学习展示
+  </footer>
+
+  <script src="js/demos/registry.js?v=20"></script>
+  <script src="js/demos/attention.js?v=20"></script>
+  <script src="js/demos/ml-trainer.js?v=20"></script>
+  <script src="js/demos/feature-eng.js?v=20"></script>
+  <script src="js/demos/gradient.js?v=20"></script>
+  <script src="js/demos/neural-net.js?v=20"></script>
+  <script src="js/demos/rl-qlearning.js?v=20"></script>
+  <script src="js/data.js?v=20"></script>
+  <script src="js/detail.js?v=20"></script>
+  <script src="js/timeline.js?v=20"></script>
+</body>
+</html>

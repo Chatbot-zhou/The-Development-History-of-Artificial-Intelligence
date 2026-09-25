@@ -1,0 +1,412 @@
+/* ============ 主题变量：米白暖调 + 亮蓝/暖橙/亮绿点缀 ============ */
+:root {
+  --bg: #faf7f0;            /* 米黄偏白主底 */
+  --bg-soft: #f3eee2;       /* 略深一档的米色 */
+  --card: #ffffff;
+  --ink: #1f2937;           /* 正文深灰 */
+  --ink-soft: #6b7280;
+  --line: #e5ddcc;          /* 轴线浅灰米 */
+
+  --blue: #2563eb;          /* 高饱和亮蓝：主强调 */
+  --blue-soft: #dbeafe;
+  --orange: #f59e0b;        /* 暖光橙：事件/热度 */
+  --orange-soft: #fef3c7;
+  --green: #10b981;         /* 亮绿：成功/收敛 */
+  --green-soft: #d1fae5;
+
+  --shadow-card: 0 10px 30px rgba(90, 74, 40, .12), 0 2px 6px rgba(90, 74, 40, .08);
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* hidden 属性优先级最高：防止被 display:flex 等样式覆盖导致元素残留 */
+[hidden] { display: none !important; }
+
+html, body { height: 100%; }
+
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(1200px 500px at 15% -10%, #fffdf7 0%, transparent 60%),
+    radial-gradient(1000px 500px at 95% 0%, #fdf6e3 0%, transparent 55%),
+    var(--bg);
+  color: var(--ink);
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* ---------- 页头 ---------- */
+.site-header {
+  text-align: center;
+  padding: 44px 20px 10px;
+}
+.site-header h1 {
+  font-size: 30px;
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+.site-header h1::after {
+  content: "";
+  display: block;
+  width: 64px; height: 4px;
+  margin: 12px auto 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--blue), var(--orange));
+}
+.site-sub {
+  margin-top: 12px;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+main { flex: 1; }
+
+/* ---------- 舞台：横向模式（时间轴） / 竖向模式（左轨道 + 右面板） ---------- */
+.stage {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  min-height: 62vh;
+  padding: 0 24px;
+}
+.stage-main {
+  flex: 1;
+  min-width: 0;
+  position: relative;           /* 供退场中的时间轴绝对定位 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;      /* 卡片 / 横向时间轴在视口内垂直居中 */
+}
+
+body.vmode .site-header { display: none; }
+body.vmode .legend { display: none; }
+/* 竖向模式下舞台撑满视口，卡片与轨道在其中垂直居中 */
+body.vmode main { display: flex; flex-direction: column; }
+body.vmode .stage { flex: 1; min-height: 0; }
+
+/* 竖向模式：左上角的站点标题（替代顶部页头，为卡片腾出空间） */
+.rail-col {
+  flex: 0 0 244px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;      /* 轨道块在列内垂直居中 */
+  min-height: 0;
+}
+.stage-brand {
+  position: absolute;           /* 固定在页面左上角，不参与布局 */
+  top: 12px;
+  left: 26px;
+  z-index: 5;
+}
+.stage-brand h1 {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  line-height: 1.4;
+}
+.stage-brand p {
+  margin-top: 4px;
+  font-size: 10px;
+  color: #b9ad92;
+  letter-spacing: 2px;
+}
+.rail-col.enter-rail { animation: slideInLeft .44s cubic-bezier(.2, .8, .3, 1) both; }
+
+/* ---------- 图例 ---------- */
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 26px;
+  padding: 8px 20px 26px;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+.legend-item { display: inline-flex; align-items: center; gap: 7px; }
+.dot {
+  width: 11px; height: 11px; border-radius: 50%;
+  display: inline-block;
+}
+.dot-milestone { background: var(--orange); }
+.dot-theory    { background: var(--blue); }
+.dot-era       { background: #d9cfb8; width: 14px; border-radius: 4px; }
+
+/* ---------- 页脚 ---------- */
+.site-footer {
+  text-align: center;
+  padding: 18px;
+  font-size: 12px;
+  color: #b9ad92;
+}
+
+/* ============ 竖向模式：右侧详情面板（detail.js） ============ */
+.detail-panel {
+  width: min(980px, 100%);
+  height: min(84vh, 780px);          /* 页头腾出空间后卡片加大，且所有事件尺寸一致 */
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 16px 26px 18px;
+  align-self: center;
+}
+.detail-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--line);
+  margin-bottom: 14px;
+  flex: none;
+}
+.detail-panel-head .demo-note { margin-left: auto; }
+.detail-panel-head .btn-ghost { padding: 7px 16px; font-size: 13px; }
+
+/* 面板正文：内部滚动，卡片外观恒定 */
+.detail-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+.detail-body::-webkit-scrollbar { width: 8px; }
+.detail-body::-webkit-scrollbar-thumb { background: #e2d9c4; border-radius: 4px; }
+
+/* ---------- 卡片内容入场编排 ---------- */
+/* 标题块：从左侧轨道方向“挪”到卡片左上角 */
+.detail-body .dg-head { animation: dgHeadMove .55s cubic-bezier(.2, .85, .3, 1) backwards; }
+@keyframes dgHeadMove {
+  from { opacity: 0; transform: translate(-64px, 22px) scale(.96); }
+}
+.detail-body .dg-figure { animation: figIn .5s cubic-bezier(.2, .85, .3, 1) .1s backwards; }
+@keyframes figIn {
+  from { opacity: 0; transform: translateX(-36px); }
+}
+.detail-body .dg-text > * { animation: riseIn .45s ease backwards; }
+.detail-body .dg-text > *:nth-child(1) { animation-delay: .14s; }
+.detail-body .dg-text > *:nth-child(2) { animation-delay: .2s; }
+.detail-body .dg-text > *:nth-child(3) { animation-delay: .26s; }
+.detail-body .dg-text > *:nth-child(4) { animation-delay: .32s; }
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(16px); }
+}
+.demo-view-head { animation: riseIn .4s ease backwards; }
+.demo-mount { animation: fadeInSoft .45s ease .08s backwards; }
+@keyframes fadeInSoft { from { opacity: 0; } }
+
+/* ---------- 一年多件大事：横向重叠的卡片牌堆 ---------- */
+/* 牌堆模式：外层容器只是定位框（无外观），牌堆卡片与单事件卡片尺寸完全一致 */
+.detail-panel.deck-mode {
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+}
+.detail-panel.deck-mode .detail-panel-head {
+  position: absolute;
+  top: 16px;
+  left: 24px;
+  right: 24px;
+  z-index: 30;
+  border-bottom: none;
+  margin-bottom: 0;
+}
+.deck-count {
+  background: var(--bg-soft);
+  border-radius: 999px;
+  padding: 3px 12px;
+  font-weight: 700;
+  color: var(--blue);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.card-deck {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.big-card {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 62px 26px 24px;      /* 顶部给悬浮的返回按钮/提示留出空间 */
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: transform .5s cubic-bezier(.25, .9, .3, 1), opacity .5s ease;
+  animation: fadeInSoft .45s ease backwards;
+}
+.big-card.is-active {
+  cursor: default;
+  border-color: #e0d7c2;
+  box-shadow: var(--shadow-card);
+}
+.big-card:hover:not(.is-active) { border-color: var(--blue); }
+.dg-evt-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.dg-evt-year {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--blue);
+  font-variant-numeric: tabular-nums;
+}
+.dg-evt-title { font-size: 19px; margin-bottom: 2px; }
+.big-card .dg-tagline { font-size: 13px; color: var(--ink-soft); margin-bottom: 10px; }
+.dg-evt-img {
+  width: 100%; height: 190px;
+  object-fit: contain;          /* 完整展示图片（logo/截图不被硬裁） */
+  background: var(--bg-soft);
+  border-radius: 10px;
+  margin: 4px 0 12px;
+  display: block;
+  padding: 8px;
+  box-sizing: border-box;
+}
+.big-card .dg-desc { font-size: 14px; }
+.big-card .dg-theory-box { margin-top: 12px; font-size: 12.5px; }
+.big-card .dg-actions { margin-top: 14px; }
+
+/* ---------- 转场动画 ---------- */
+/* 时间轴退场：立即脱离文档流（自身原地淡出），避免面板中途重新居中造成跳动 */
+.timeline-wrap.leave-tl {
+  position: absolute;
+  top: 50%;
+  margin-top: -205px;
+  left: 0;
+  right: 0;
+  animation: fadeOutLeft2 .32s ease both;
+  pointer-events: none;
+}
+@keyframes fadeOutLeft2 {
+  to { opacity: 0; transform: translateX(-90px); }
+}
+.leave-tl    { animation: fadeOutLeft2 .32s ease both; }
+.reenter-tl  { animation: fadeInUp2 .42s ease both; }
+.enter-rail  { animation: slideInLeft .44s cubic-bezier(.2, .8, .3, 1) both; }
+.leave-rail  { animation: fadeOutLeft .3s ease both; }
+.enter-panel { animation: slideInRight .46s cubic-bezier(.2, .8, .3, 1) both; }
+.leave-panel { animation: fadeOutRight .3s ease both; }
+
+@keyframes fadeOutLeft {
+  to { opacity: 0; transform: translateX(-90px) scale(.985); }
+}
+@keyframes fadeOutRight {
+  to { opacity: 0; transform: translateX(70px); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-90px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(70px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeInUp2 {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 详情：卡片左上角标题块 */
+.dg-head { margin-bottom: 14px; }
+.dg-head .dg-year { font-size: 32px; }
+.dg-head .dg-title { font-size: 22px; margin: 4px 0 2px; }
+.dg-head .dg-tagline { margin-bottom: 0; }
+
+/* 详情：图文布局 */
+.dg-hero { display: flex; align-items: stretch; }
+.dg-figure {
+  flex: 0 0 42%;
+  min-width: 280px;
+  position: relative;
+  overflow: hidden;
+  height: 330px;                    /* 图片块高度固定，卡片视觉一致 */
+  border-radius: 12px;
+  background: var(--bg-soft);
+}
+.dg-figure img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.dg-figure figcaption {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 8px 14px;
+  font-size: 11px;
+  color: #fff;
+  background: linear-gradient(transparent, rgba(40, 32, 12, .65));
+}
+.dg-text { flex: 1; min-width: 0; padding: 2px 2px 8px 26px; }
+.dg-year {
+  display: inline-block;
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--blue);
+  letter-spacing: 1px;
+}
+.dg-title { font-size: 21px; font-weight: 700; margin: 6px 0 4px; }
+.dg-tagline { color: var(--ink-soft); font-size: 13px; margin-bottom: 14px; }
+.dg-desc { font-size: 14.5px; line-height: 1.85; color: #374151; }
+.dg-desc p + p { margin-top: 8px; }
+
+.dg-theory-box {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-left: 3px solid var(--blue);
+  background: var(--blue-soft);
+  border-radius: 0 10px 10px 0;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #1e3a8a;
+}
+.dg-theory-box b { display: block; margin-bottom: 4px; }
+
+.dg-actions { margin-top: 20px; display: flex; gap: 12px; }
+.btn {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  font-family: inherit;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn-primary {
+  background: var(--blue); color: #fff;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, .35);
+}
+.btn-ghost {
+  background: var(--bg-soft); color: var(--ink-soft);
+}
+.btn-orange {
+  background: var(--orange); color: #fff;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, .35);
+}
+
+/* 面板内的演示视图 */
+.demo-view-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 2px 0 10px;
+}
+.demo-view-head h3 { font-size: 18px; }
+.demo-view-head .back {
+  margin-left: auto;
+}
+.demo-mount { padding: 12px 0 4px; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes popUp {
+  from { opacity: 0; transform: translateY(26px) scale(.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
