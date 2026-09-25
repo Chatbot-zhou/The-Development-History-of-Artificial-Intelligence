@@ -19,6 +19,7 @@
   let cardIdx = 0;          // 年份组内的卡片序号
   let view = "intro";       // intro | demo
   let vmode = false;
+  let transitionGen = 0;    // 转场代际：快速连续切换时使过期的定时器失效
   let currentDemo = null;
   let wheelLock = 0;
 
@@ -253,12 +254,14 @@
   function enterVMode(g) {
     if (!g) return;
     if (vmode) { setEvent(g, 0); return; }
+    const gen = ++transitionGen;
     vmode = true;
     document.body.classList.add("vmode");
 
     // 1) 横向时间轴立刻开始退场（0.32s）
     timelineWrap.classList.add("leave-tl");
     setTimeout(() => {
+      if (gen !== transitionGen) return;
       timelineWrap.hidden = true;
       timelineWrap.classList.remove("leave-tl");
     }, 330);
@@ -281,11 +284,13 @@
   function exitVMode() {
     if (!vmode) return;
     destroyDemo();
+    const gen = ++transitionGen;
     vmode = false;
     view = "intro";
     railCol.classList.add("leave-rail");
     panel.classList.add("leave-panel");
     setTimeout(() => {
+      if (gen !== transitionGen) return;
       railCol.hidden = true; panel.hidden = true;
       railCol.classList.remove("leave-rail");
       panel.classList.remove("leave-panel");

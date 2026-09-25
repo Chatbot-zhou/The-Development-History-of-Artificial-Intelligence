@@ -55,7 +55,7 @@
     const toPx = (x, y) => [(x + DOM) / (2 * DOM) * CW, (DOM - y) / (2 * DOM) * CH];
     const toXY = (px, py) => [px / CW * 2 * DOM - DOM, DOM - py / CH * 2 * DOM];
 
-    let ball = null, trail = [], running = false, raf = 0, steps = 0;
+    let ball = null, ballVis = null, trail = [], running = false, raf = 0, steps = 0;
     let lr = 0.18;
 
     /* ---------- 背景：等高线热图 ---------- */
@@ -112,7 +112,26 @@
     }
 
     function paintBall() {
-      if (!ball) return;
+      if (!ball || !ballVis) return;
+      // 最陡下降方向箭头（红色虚线）
+      const [gx0, gy0] = grad(ballVis[0], ballVis[1]);
+      const mag0 = Math.hypot(gx0, gy0);
+      if (mag0 > 0.03 && steps < 400) {
+        const ux = -gx0 / mag0, uy = -gy0 / mag0, L = 0.5;
+        const [ax1, ay1] = toPx(ballVis[0], ballVis[1]);
+        const [ax2, ay2] = toPx(ballVis[0] + ux * L, ballVis[1] + uy * L);
+        ctx.strokeStyle = "rgba(224,92,92,.85)"; ctx.lineWidth = 2;
+        ctx.setLineDash([5, 4]);
+        ctx.beginPath(); ctx.moveTo(ax1, ay1); ctx.lineTo(ax2, ay2); ctx.stroke();
+        ctx.setLineDash([]);
+        const ang = Math.atan2(ay2 - ay1, ax2 - ax1);
+        ctx.beginPath();
+        ctx.moveTo(ax2, ay2);
+        ctx.lineTo(ax2 - 9 * Math.cos(ang - 0.4), ay2 - 9 * Math.sin(ang - 0.4));
+        ctx.lineTo(ax2 - 9 * Math.cos(ang + 0.4), ay2 - 9 * Math.sin(ang + 0.4));
+        ctx.closePath();
+        ctx.fillStyle = "rgba(224,92,92,.85)"; ctx.fill();
+      }
       // 轨迹
       trail.forEach((p, i) => {
         const [px, py] = toPx(p[0], p[1]);
@@ -121,7 +140,7 @@
         ctx.fillStyle = "rgba(37,99,235," + (0.12 + i / trail.length * 0.45) + ")";
         ctx.fill();
       });
-      const [px, py] = toPx(ball[0], ball[1]);
+      const [px, py] = toPx(ballVis[0], ballVis[1]);
       ctx.beginPath();
       ctx.arc(px, py, 9, 0, Math.PI * 2);
       ctx.fillStyle = "#2563eb";
@@ -148,6 +167,9 @@
       steps++;
       trail.push([ball[0], ball[1]]);
       if (trail.length > 120) trail.shift();
+      // 可视位置向逻辑位置平滑插值（消除逐帧跳动感）
+      ballVis[0] += (ball[0] - ballVis[0]) * 0.3;
+      ballVis[1] += (ball[1] - ballVis[1]) * 0.3;
 
       const out = Math.abs(ball[0]) > DOM + 0.8 || Math.abs(ball[1]) > DOM + 0.8;
       const [gx2, gy2] = grad(ball[0], ball[1]);

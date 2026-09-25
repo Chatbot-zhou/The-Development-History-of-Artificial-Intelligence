@@ -245,7 +245,8 @@
         // 叠加 HTML 标签展示输出向量
         const outTag = document.createElement("div");
         outTag.className = "att-outvec";
-        outTag.style.left = "calc(50% - 60px)";
+        outTag.style.left = (selX / W * 100) + "%";
+        outTag.style.transform = "translateX(-50%)";
         outTag.innerHTML = '<span>输出向量</span><span class="tok-vec">' + strip + "</span>";
         stageEl.appendChild(outTag);
       }, 4500);

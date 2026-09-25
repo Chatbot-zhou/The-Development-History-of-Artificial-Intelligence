@@ -85,8 +85,12 @@
     /* ---------- 绘制 ---------- */
     const toPx = (x, y) => [(x + 1) / 2 * CW, (1 - y) / 2 * CH];
 
+    const bOff = document.createElement("canvas");
+    bOff.width = 130; bOff.height = 100;
+    const bCtx = bOff.getContext("2d");
     function paintBoundary() {
-      const cols = 104, rows = 80, cw = CW / cols, ch = CH / rows;
+      const cols = 130, rows = 100;
+      const img = bCtx.createImageData(cols, rows);
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           const x = (c + 0.5) / cols * 2 - 1;
@@ -96,12 +100,18 @@
             ? sig(w[0] + w[1] * x + w[2] * y)
             : predict(f);
           const t = Math.abs(p - 0.5) * 2;
-          ctx.fillStyle = p > 0.5
-            ? "rgba(16,185,129," + (0.07 + t * 0.30) + ")"
-            : "rgba(245,158,11," + (0.09 + t * 0.32) + ")";
-          ctx.fillRect(c * cw, r * ch, cw + 1, ch + 1);
+          const [cr, cg, cb] = p > 0.5 ? [16, 185, 129] : [245, 158, 11];
+          const a = 0.07 + t * 0.30;
+          const i = (r * cols + c) * 4;
+          img.data[i]     = Math.round(253 - (253 - cr) * a);
+          img.data[i + 1] = Math.round(251 - (251 - cg) * a);
+          img.data[i + 2] = Math.round(246 - (246 - cb) * a);
+          img.data[i + 3] = 255;
         }
       }
+      bCtx.putImageData(img, 0, 0);
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(bOff, 0, 0, CW, CH);
     }
 
     function paint() {
