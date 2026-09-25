@@ -73,6 +73,7 @@
 }
 @keyframes nodeIn {
   from { opacity: 0; }
+  to   { opacity: 1; }   /* 必须显式写 to：否则回退到基础 opacity:0，动画结束后节点会消失 */
 }
 
 .tl-node .title {
